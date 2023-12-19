@@ -2,10 +2,33 @@
 const elems = document.getElementById('elements');
 const boxFlex = document.querySelector('#box_flex');
 const boxFreedom = document.querySelector('#box_freedom');
+const backgroundBoxFlex = document.querySelector('#color_backgroundFlex');
+const backgroundBoxFreedom = document.querySelector('#color_backgroundFreedom');
+
 let isDown = false;
 let absCopyNode = null;
 let offset = [0,0 ];
 const coordinateByDivFreedom = [ 0,0];
+
+
+const createSpan = (letter,color) =>
+{
+    const span = document.createElement('span');
+    span.textContent = letter;
+    span.style.color = color;
+    return span;
+}
+const createBeautifulWord = (idElem,str,...colors) =>
+{
+    const title = document.getElementById(idElem);
+    for(let i =0, j = 0;i<str.length;i++,j++)
+    {
+        if(colors[j] === undefined)
+            j = 0;
+        title.appendChild(createSpan(str[i],colors[j]));
+    }
+}
+
 document.addEventListener('DOMContentLoaded',(e) =>
 {
     console.log('DOM loaded');
@@ -19,19 +42,22 @@ document.addEventListener('DOMContentLoaded',(e) =>
                     absCopyNode = elem.cloneNode();
                     
                     elem.after(absCopyNode);
-                    absCopyNode.style = 'position:absolute;';
+                    absCopyNode.style = 'position:absolute; border-radius: 50%;';
                     
                     offset = [
                         elem.offsetLeft - e.clientX,
                         elem.offsetTop - e.clientY
                     ];
-                    absCopyNode.style.left = (e.clientX + offset[0]) + 'px';
-                    absCopyNode.style.top  = (e.clientY + offset[1]) + 'px';
+                    moveElemWithMouse(e,absCopyNode);
                     isDown = true;
                 },true);
             }
 
-        })
+        });
+
+    createBeautifulWord('elementsTitle','Elements','red','purple','','red','blue','red','purple','#CB401B','blue','#30360F','red','','#EBD3B7','#D04861');
+    createBeautifulWord('titleFlex','Flex','#CB401B','blue','#30360F','red','#EBD3B7','#D04861');
+    createBeautifulWord('titleFreedom','Freedom','green','blue','#30360F','red','cyan','#D04861');
 });
 
 const isMoveElem = (elem) =>
@@ -45,13 +71,42 @@ const isCurrentBox = (target,idBox) =>
     return target && (target?.id === idBox || (parent && parent.id === idBox));
 }
 
+const moveElemWithMouse = (event,elem) =>
+{
+    elem.style.left = (event.clientX + offset[0]) + 'px';
+    elem.style.top  = (event.clientY + offset[1]) + 'px';
+}
+
+const addBackgroundToBox = (elem,...classlist) =>
+{
+    if(elem.classList.contains(...classlist)===false)
+        elem.classList.add(...classlist);
+}
+
+const removeBackgroundToBox = (elem, ...classlist) =>
+{
+    if(elem.classList.contains(...classlist)===true)
+        elem.classList.remove(...classlist);
+}
+
+
 document.addEventListener('pointermove', (e) =>
 {
     e.preventDefault();  
-    if(isDown === true && absCopyNode !== null)
+    if(isMoveElem(absCopyNode))
     {
-        absCopyNode.style.left = (e.clientX + offset[0]) + 'px';
-        absCopyNode.style.top  = (e.clientY + offset[1]) + 'px';
+        moveElemWithMouse(e,absCopyNode);
+        if(isCurrentBox(e.target,'box_flex'))
+        {
+            addBackgroundToBox(backgroundBoxFlex,'boxFlexChangeBackground');
+        }else if (isCurrentBox(e.target,'box_freedom'))
+        {
+            addBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
+        }else
+        {
+            removeBackgroundToBox(backgroundBoxFlex,'boxFlexChangeBackground');
+            removeBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
+        }
     }
 },true);
 if(boxFreedom)
@@ -61,8 +116,9 @@ if(boxFreedom)
         if(isMoveElem(absCopyNode))
         {
             const rect = boxFreedom.getBoundingClientRect();
-            coordinateByDivFreedom[0] = e.clientX - rect.left-50;
-            coordinateByDivFreedom[1] = e.clientY - rect.top-50;
+            console.log(absCopyNode.height);
+            coordinateByDivFreedom[0] = e.clientX - rect.left - (absCopyNode.width / 2);
+            coordinateByDivFreedom[1] = e.clientY - rect.top - (absCopyNode.height / 2 );
         }
     });
 }
@@ -74,11 +130,13 @@ document.addEventListener('pointerup', (e) =>
         if( isCurrentBox(e.target,'box_flex'))
         {
             console.log('flex');
+            removeBackgroundToBox(backgroundBoxFlex,'boxFlexChangeBackground');
             absCopyNode.style = 'position:relative;';
             boxFlex.appendChild(absCopyNode);
         }else if(isCurrentBox(e.target,'box_freedom'))
         {
             console.log('freedom');
+            removeBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
             boxFreedom.appendChild(absCopyNode);
             absCopyNode.style.left =  coordinateByDivFreedom[0] + 'px';
             absCopyNode.style.top  = coordinateByDivFreedom[1] + 'px';
@@ -88,7 +146,6 @@ document.addEventListener('pointerup', (e) =>
         }
     }
     
-    console.log(e.target.id);
     isDown = false;
     absCopyNode = null;
 },true);
@@ -119,9 +176,143 @@ function onWheel(e)
 
     // wheelDelta не даёт возможность узнать количество пикселей
     var delta = e.deltaY || e.detail || e.wheelDelta;
-    console.log(e.target);
     if(isMoveElem(absCopyNode) && e.target && e.target.id !== 'box_freedom')
     {
         offset[1] += delta;
     }
 }
+
+
+
+
+//--------------------------------------------- Animation Snow
+const canvas = document.querySelector('canvas')
+const ctx = canvas.getContext('2d')
+
+let width, height, lastNow;
+let snowflakes;
+const maxSnowflakes = 100;
+let delay = 0;
+const duration = 10;
+const time = new Date().getTime();
+const colors = ['red','blue','white'];
+
+function randomColorSnow(t)
+{
+    if (t < delay)
+        return 0;
+
+    delay += duration;
+    let r = Math.floor(rand(1,15));
+    if (r > 10)
+        ctx.fillStyle = ctx.strokeStyle = colors[0];
+    else if(r > 5)
+        ctx.fillStyle = ctx.strokeStyle = colors[1];
+    else
+        ctx.fillStyle = ctx.strokeStyle = colors[2];
+}
+function init() 
+{
+    snowflakes = []
+    resize()
+    render(lastNow = performance.now())
+}
+
+function render(now) 
+{
+    requestAnimationFrame(render)
+    
+    const elapsed = now - lastNow
+    lastNow = now
+    
+    ctx.clearRect(0, 0, width, height)
+    if (snowflakes.length < maxSnowflakes)
+        snowflakes.push(new Snowflake());
+
+    let t = (new Date().getTime() - time) / 1000;
+    randomColorSnow(t);
+   // console.log(Math.ceil(t));
+    snowflakes.forEach(snowflake => snowflake.update(elapsed, now))
+}
+
+function pause() 
+{
+    cancelAnimationFrame(render)
+}
+function resume() 
+{
+    lastNow = performance.now()
+    requestAnimationFrame(render)
+}
+
+
+class Snowflake 
+{
+    constructor() 
+    {
+        this.spawn()
+    }
+  
+    spawn(anyY = false) 
+    {
+        this.x = rand(0, width)
+        this.y = anyY === true
+        ? rand(-50, height + 50)
+        : rand(-50, -10)
+        this.xVel = rand(-.05, .05)
+        this.yVel = rand(.02, .1)
+        this.angle = rand(0, Math.PI * 2)
+        this.angleVel = rand(-.001, .001)
+        this.size = rand(7, 12)
+        this.sizeOsc = rand(.01, .5)
+    }
+  
+    update(elapsed, now) 
+    {
+        const xForce = rand(-.001, .001);
+
+        if (Math.abs(this.xVel + xForce) < .075)
+        {
+            this.xVel += xForce
+        }
+        
+        this.x += this.xVel * elapsed
+        this.y += this.yVel * elapsed
+        this.angle += this.xVel * 0.05 * elapsed //this.angleVel * elapsed
+        
+        if (
+        this.y - this.size > height ||
+        this.x + this.size < 0 ||
+        this.x - this.size > width
+        ) {
+            this.spawn()
+        }
+        
+        this.render()
+    }
+  
+    render() 
+    {
+        ctx.save()
+        const { x, y, angle, size } = this
+        ctx.beginPath()
+        ctx.arc(x, y, size * 0.2, 0, Math.PI * 2, false)
+        ctx.fill()
+        ctx.fillStyle = ctx.strokeStyle = colors[2];
+        ctx.restore()
+    }
+}
+
+// Utils
+const rand = (min, max) => min + Math.random() * (max - min)
+
+function resize() 
+{
+    width = canvas.width = window.innerWidth
+    height = canvas.height = window.innerHeight
+}
+
+window.addEventListener('resize', resize)
+window.addEventListener('blur', pause)
+window.addEventListener('focus', resume)
+init()

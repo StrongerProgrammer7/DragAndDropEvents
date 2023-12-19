@@ -12,10 +12,11 @@
     <title>Drag and Drop</title>
 </head>
 <body>
+    <canvas></canvas>
     <main class="content">
         <div class="container">
             <div class="row">
-                <h1 class="h1 title">Elements</h1>
+                <h1 class="h1 title" id="elementsTitle"></h1>
                 <div class="d-flex elements" id="elements">
                     <img src="./assets/imgs/1.jpg" class="elements__img" alt="image" />
                     <img src="./assets/imgs/2.jpg" class="elements__img" alt="image" />
@@ -24,15 +25,15 @@
             </div>
             <div class="row justify-content-center">
                 <div class="box position-relative">
-                    <h3 class="h3 position-absolute bottom-0 end-0 titleBox">Flex</h3>
+                    <h3 class="h3 position-absolute bottom-0 end-0 titleBox" id="titleFlex"></h3>
                     <div class="d-flex justify-content-center box-flex" id="box_flex">
-
+                        <div class="color_backgroundFlex" id="color_backgroundFlex"></div>
                     </div>
                 </div>
                 <div class="box position-relative">
-                    <h3 class="h3 position-absolute bottom-0 start-0 titleBox">Freedom</h3>
+                    <h3 class="h3 position-absolute bottom-0 start-0 titleBox" id="titleFreedom"></h3>
                     <div class="box-freedom" id="box_freedom">
-
+                        <div class="color_backgroundFreedom" id="color_backgroundFreedom"></div>
                     </div>
                 </div>
             </div>
