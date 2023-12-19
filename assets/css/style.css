@@ -103,7 +103,7 @@ img{
 {
     margin-bottom: 25px;
 }
-.elements img
+.elements__img
 {
     width: 100px;
     height: 100px;
@@ -124,6 +124,19 @@ img{
 .box-flex
 {
     width: 100%;
-    height: 100%;
-    
+	height: 100%;
+    flex-wrap: wrap;
+
+	overflow-x: hidden;
+}
+.box-freedom
+{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow-x: hidden;
+}
+.titleBox
+{
+	z-index: 2;
 }
