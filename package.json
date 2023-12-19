@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/StrongerProgrammer7/DragAndDropEvents/issues"
   },
-  "homepage": "https://github.com/StrongerProgrammer7/DragAndDropEvents#readme"
+  "homepage": "https://github.com/StrongerProgrammer7/DragAndDropEvents#readme",
+  "dependencies": {
+    "gh-pages": "^6.1.0"
+  }
 }
