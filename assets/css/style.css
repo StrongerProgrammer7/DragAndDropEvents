@@ -107,6 +107,7 @@ img{
 {
     width: 100px;
     height: 100px;
+    margin: 5px;
 }
 
 
@@ -124,5 +125,5 @@ img{
 {
     width: 100%;
     height: 100%;
-    background: rgb(223, 223, 223);
+    
 }
