@@ -1,0 +1,26 @@
+{
+  "name": "draganddropevents",
+  "version": "0.0.1",
+  "description": "Teach drag and drop events hhru",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StrongerProgrammer7/DragAndDropEvents.git"
+  },
+  "keywords": [
+    "html",
+    "css",
+    "bootstrap",
+    "dragAndDrop",
+    "pointEvent"
+  ],
+  "author": "Abduykov Z.M.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StrongerProgrammer7/DragAndDropEvents/issues"
+  },
+  "homepage": "https://github.com/StrongerProgrammer7/DragAndDropEvents#readme"
+}
