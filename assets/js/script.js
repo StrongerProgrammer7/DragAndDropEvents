@@ -5,6 +5,7 @@ const boxFreedom = document.querySelector('#box_freedom');
 let isDown = false;
 let absCopyNode = null;
 let offset = [0,0 ];
+const coordinateByDivFreedom = [ 0,0];
 document.addEventListener('DOMContentLoaded',(e) =>
 {
     console.log('DOM loaded');
@@ -19,11 +20,14 @@ document.addEventListener('DOMContentLoaded',(e) =>
                     
                     elem.after(absCopyNode);
                     absCopyNode.style = 'position:absolute;';
-                    isDown = true;
+                    
                     offset = [
                         elem.offsetLeft - e.clientX,
                         elem.offsetTop - e.clientY
                     ];
+                    absCopyNode.style.left = (e.clientX + offset[0]) + 'px';
+                    absCopyNode.style.top  = (e.clientY + offset[1]) + 'px';
+                    isDown = true;
                 },true);
             }
 
@@ -50,6 +54,19 @@ document.addEventListener('pointermove', (e) =>
         absCopyNode.style.top  = (e.clientY + offset[1]) + 'px';
     }
 },true);
+if(boxFreedom)
+{
+    boxFreedom.addEventListener('pointermove',(e) =>
+    {
+        if(isMoveElem(absCopyNode))
+        {
+            const rect = boxFreedom.getBoundingClientRect();
+            coordinateByDivFreedom[0] = e.clientX - rect.left-50;
+            coordinateByDivFreedom[1] = e.clientY - rect.top-50;
+        }
+    });
+}
+
 document.addEventListener('pointerup', (e) =>
 {
     if(isMoveElem(absCopyNode) === true)
@@ -63,6 +80,8 @@ document.addEventListener('pointerup', (e) =>
         {
             console.log('freedom');
             boxFreedom.appendChild(absCopyNode);
+            absCopyNode.style.left =  coordinateByDivFreedom[0] + 'px';
+            absCopyNode.style.top  = coordinateByDivFreedom[1] + 'px';
         }else 
         {
             elems.removeChild(absCopyNode); 
@@ -100,7 +119,8 @@ function onWheel(e)
 
     // wheelDelta не даёт возможность узнать количество пикселей
     var delta = e.deltaY || e.detail || e.wheelDelta;
-    if(isMoveElem(absCopyNode))
+    console.log(e.target);
+    if(isMoveElem(absCopyNode) && e.target && e.target.id !== 'box_freedom')
     {
         offset[1] += delta;
     }
