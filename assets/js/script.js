@@ -9,6 +9,7 @@ let isDown = false;
 let absCopyNode = null;
 let offset = [0,0 ];
 const coordinateByDivFreedom = [ 0,0];
+const preloadedImages = {};
 
 const isMoveElem = (elem) =>
 {
@@ -87,10 +88,20 @@ document.addEventListener('DOMContentLoaded',(e) =>
         {
             if(elem)
             {
+                if (!preloadedImages[elem.src]) 
+                {
+                    preloadedImages[elem.src] = new Image();
+                    preloadedImages[elem.src].src = elem.src;
+                    preloadedImages[elem.src].className = 'elements__img';
+                }
+                
                 elem.addEventListener('pointerdown',(e)=>
                 {
-                    absCopyNode = elem.cloneNode();
-                    
+                    //absCopyNode = elem.cloneNode();
+                    absCopyNode = new Image();
+                    absCopyNode.className = preloadedImages[elem.src].className;
+                    absCopyNode.src = preloadedImages[elem.src].src;
+
                     elem.after(absCopyNode);
                     absCopyNode.style = 'position:absolute; border-radius: 50%;';
                     
