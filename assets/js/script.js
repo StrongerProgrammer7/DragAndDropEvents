@@ -10,56 +10,6 @@ let absCopyNode = null;
 let offset = [0,0 ];
 const coordinateByDivFreedom = [ 0,0];
 
-
-const createSpan = (letter,color) =>
-{
-    const span = document.createElement('span');
-    span.textContent = letter;
-    span.style.color = color;
-    return span;
-}
-const createBeautifulWord = (idElem,str,...colors) =>
-{
-    const title = document.getElementById(idElem);
-    for(let i =0, j = 0;i<str.length;i++,j++)
-    {
-        if(colors[j] === undefined)
-            j = 0;
-        title.appendChild(createSpan(str[i],colors[j]));
-    }
-}
-
-document.addEventListener('DOMContentLoaded',(e) =>
-{
-    console.log('DOM loaded');
-    let imgs = elems?.querySelectorAll('img');
-    imgs?.forEach(elem => 
-        {
-            if(elem)
-            {
-                elem.addEventListener('pointerdown',(e)=>
-                {
-                    absCopyNode = elem.cloneNode();
-                    
-                    elem.after(absCopyNode);
-                    absCopyNode.style = 'position:absolute; border-radius: 50%;';
-                    
-                    offset = [
-                        elem.offsetLeft - e.clientX,
-                        elem.offsetTop - e.clientY
-                    ];
-                    moveElemWithMouse(e,absCopyNode);
-                    isDown = true;
-                },true);
-            }
-
-        });
-
-    createBeautifulWord('elementsTitle','Elements','red','purple','','red','blue','red','purple','#CB401B','blue','#30360F','red','','#EBD3B7','#D04861');
-    createBeautifulWord('titleFlex','Flex','#CB401B','blue','#30360F','red','#EBD3B7','#D04861');
-    createBeautifulWord('titleFreedom','Freedom','green','blue','#30360F','red','cyan','#D04861');
-});
-
 const isMoveElem = (elem) =>
 {
     return isDown === true && elem !== null;
@@ -90,7 +40,26 @@ const removeBackgroundToBox = (elem, ...classlist) =>
 }
 
 
-document.addEventListener('pointermove', (e) =>
+
+const createSpan = (letter,color) =>
+{
+    const span = document.createElement('span');
+    span.textContent = letter;
+    span.style.color = color;
+    return span;
+}
+const createBeautifulWord = (idElem,str,...colors) =>
+{
+    const title = document.getElementById(idElem);
+    for(let i =0, j = 0;i<str.length;i++,j++)
+    {
+        if(colors[j] === undefined)
+            j = 0;
+        title.appendChild(createSpan(str[i],colors[j]));
+    }
+}
+
+const moveElem = (e) =>
 {
     e.preventDefault();  
     if(isMoveElem(absCopyNode))
@@ -108,7 +77,41 @@ document.addEventListener('pointermove', (e) =>
             removeBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
         }
     }
-},true);
+}
+
+document.addEventListener('DOMContentLoaded',(e) =>
+{
+    console.log('DOM loaded');
+    let imgs = elems?.querySelectorAll('img');
+    imgs?.forEach(elem => 
+        {
+            if(elem)
+            {
+                elem.addEventListener('pointerdown',(e)=>
+                {
+                    absCopyNode = elem.cloneNode();
+                    
+                    elem.after(absCopyNode);
+                    absCopyNode.style = 'position:absolute; border-radius: 50%;';
+                    
+                    offset = [
+                        elem.offsetLeft - e.clientX,
+                        elem.offsetTop - e.clientY
+                    ];
+                    moveElemWithMouse(e,absCopyNode);
+                    isDown = true;
+                    document.addEventListener('pointermove',moveElem ,true);
+                },true);
+                
+            }
+
+        });
+
+    createBeautifulWord('elementsTitle','Elements','red','purple','','red','blue','red','purple','#CB401B','blue','#30360F','red','','#EBD3B7','#D04861');
+    createBeautifulWord('titleFlex','Flex','#CB401B','blue','#30360F','red','#EBD3B7','#D04861');
+    createBeautifulWord('titleFreedom','Freedom','green','blue','#30360F','red','cyan','#D04861');
+});
+
 if(boxFreedom)
 {
     boxFreedom.addEventListener('pointermove',(e) =>
@@ -144,6 +147,7 @@ document.addEventListener('pointerup', (e) =>
         {
             elems.removeChild(absCopyNode); 
         }
+        document.removeEventListener('pointermove',moveElem,true);
     }
     
     isDown = false;
