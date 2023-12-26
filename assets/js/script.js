@@ -10,6 +10,8 @@ let absCopyNode = null;
 let offset = [0,0 ];
 const coordinateByDivFreedom = [ 0,0];
 const preloadedImages = {};
+let coordinateMouseOnImg_X = 0;
+let coordinateMouseOnImg_Y = 0;
 
 const isMoveElem = (elem) =>
 {
@@ -26,38 +28,6 @@ const moveElemWithMouse = (event,elem) =>
 {
     elem.style.left = (event.clientX + offset[0]) + 'px';
     elem.style.top  = (event.clientY + offset[1]) + 'px';
-}
-
-const addBackgroundToBox = (elem,...classlist) =>
-{
-    if(elem.classList.contains(...classlist)===false)
-        elem.classList.add(...classlist);
-}
-
-const removeBackgroundToBox = (elem, ...classlist) =>
-{
-    if(elem.classList.contains(...classlist)===true)
-        elem.classList.remove(...classlist);
-}
-
-
-
-const createSpan = (letter,color) =>
-{
-    const span = document.createElement('span');
-    span.textContent = letter;
-    span.style.color = color;
-    return span;
-}
-const createBeautifulWord = (idElem,str,...colors) =>
-{
-    const title = document.getElementById(idElem);
-    for(let i =0, j = 0;i<str.length;i++,j++)
-    {
-        if(colors[j] === undefined)
-            j = 0;
-        title.appendChild(createSpan(str[i],colors[j]));
-    }
 }
 
 const moveElem = (e) =>
@@ -77,6 +47,43 @@ const moveElem = (e) =>
             removeBackgroundToBox(backgroundBoxFlex,'boxFlexChangeBackground');
             removeBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
         }
+    }
+}
+
+const saveCoordinateMouseOnTheImage = (elem,event) =>
+{
+    const rect = elem.getBoundingClientRect();
+    coordinateMouseOnImg_X = event.clientX - rect.left;
+    coordinateMouseOnImg_Y = event.clientY - rect.top;
+}
+
+const addBackgroundToBox = (elem,...classlist) =>
+{
+    if(elem.classList.contains(...classlist)===false)
+        elem.classList.add(...classlist);
+}
+
+const removeBackgroundToBox = (elem, ...classlist) =>
+{
+    if(elem.classList.contains(...classlist)===true)
+        elem.classList.remove(...classlist);
+}
+
+const createSpan = (letter,color) =>
+{
+    const span = document.createElement('span');
+    span.textContent = letter;
+    span.style.color = color;
+    return span;
+}
+const createBeautifulWord = (idElem,str,...colors) =>
+{
+    const title = document.getElementById(idElem);
+    for(let i =0, j = 0;i<str.length;i++,j++)
+    {
+        if(colors[j] === undefined)
+            j = 0;
+        title.appendChild(createSpan(str[i],colors[j]));
     }
 }
 
@@ -103,17 +110,24 @@ document.addEventListener('DOMContentLoaded',(e) =>
                     absCopyNode.src = preloadedImages[elem.src].src;
 
                     elem.after(absCopyNode);
+                    saveCoordinateMouseOnTheImage(elem,e);
+                   
                     absCopyNode.style = 'position:absolute; border-radius: 50%;';
                     
                     offset = [
                         elem.offsetLeft - e.clientX,
                         elem.offsetTop - e.clientY
                     ];
+
                     moveElemWithMouse(e,absCopyNode);
                     isDown = true;
                     document.addEventListener('pointermove',moveElem ,true);
                 },true);
                 
+                elem.ondragstart = () =>
+                {
+                    return false;
+                }
             }
 
         });
@@ -130,9 +144,10 @@ if(boxFreedom)
         if(isMoveElem(absCopyNode))
         {
             const rect = boxFreedom.getBoundingClientRect();
-            console.log(absCopyNode.height);
-            coordinateByDivFreedom[0] = e.clientX - rect.left - (absCopyNode.width / 2);
-            coordinateByDivFreedom[1] = e.clientY - rect.top - (absCopyNode.height / 2 );
+
+            coordinateByDivFreedom[0] = e.clientX - rect.left - coordinateMouseOnImg_X;//(absCopyNode.width / 2); - if center of cursor on mouse
+            coordinateByDivFreedom[1] = e.clientY - rect.top - coordinateMouseOnImg_Y;//(absCopyNode.height / 2 ); - if center of cursor on mouse
+        
         }
     });
 }
@@ -141,6 +156,7 @@ document.addEventListener('pointerup', (e) =>
 {
     if(isMoveElem(absCopyNode) === true)
     {
+
         if( isCurrentBox(e.target,'box_flex'))
         {
             console.log('flex');
@@ -152,6 +168,7 @@ document.addEventListener('pointerup', (e) =>
             console.log('freedom');
             removeBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
             boxFreedom.appendChild(absCopyNode);
+            //absCopyNode.style.imageRendering = 'pixelated';
             absCopyNode.style.left =  coordinateByDivFreedom[0] + 'px';
             absCopyNode.style.top  = coordinateByDivFreedom[1] + 'px';
         }else 
