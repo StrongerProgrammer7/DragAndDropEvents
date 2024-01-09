@@ -41,6 +41,10 @@ const moveElem = (e) =>
             addBackgroundToBox(backgroundBoxFlex,'boxFlexChangeBackground');
         }else if (isCurrentBox(e.target,'box_freedom'))
         {
+            const rect = e.target.getBoundingClientRect();
+            coordinateByDivFreedom[0] = e.clientX - rect.left - coordinateMouseOnImg_X;//(absCopyNode.width / 2); - if center of cursor on mouse
+            coordinateByDivFreedom[1] = e.clientY - rect.top - coordinateMouseOnImg_Y;//(absCopyNode.height / 2 ); - if center of cursor on mouse
+
             addBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
         }else
         {
@@ -48,6 +52,39 @@ const moveElem = (e) =>
             removeBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
         }
     }
+   
+    
+}
+
+const putElem = (e) =>
+{
+    if(isMoveElem(absCopyNode) === true)
+    {
+
+        if( isCurrentBox(e.target,'box_flex'))
+        {
+            console.log('flex');
+            removeBackgroundToBox(backgroundBoxFlex,'boxFlexChangeBackground');
+            absCopyNode.style = 'position:relative;';
+            boxFlex.appendChild(absCopyNode);
+        }else if(isCurrentBox(e.target,'box_freedom'))
+        {
+            console.log('freedom');
+            removeBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
+            boxFreedom.appendChild(absCopyNode);
+            //absCopyNode.style.imageRendering = 'pixelated';
+            absCopyNode.style.left =  coordinateByDivFreedom[0] + 'px';
+            absCopyNode.style.top  = coordinateByDivFreedom[1] + 'px';
+        }else 
+        {
+            elems.removeChild(absCopyNode); 
+        }
+        document.removeEventListener('pointermove',moveElem,true);
+        document.removeEventListener('pointerup',putElem,true);
+    }
+    
+    isDown = false;
+    absCopyNode = null;
 }
 
 const saveCoordinateMouseOnTheImage = (elem,event) =>
@@ -122,6 +159,7 @@ document.addEventListener('DOMContentLoaded',(e) =>
                     moveElemWithMouse(e,absCopyNode);
                     isDown = true;
                     document.addEventListener('pointermove',moveElem ,true);
+                    document.addEventListener('pointerup', putElem,true);
                 },true);
                 
                 elem.ondragstart = () =>
@@ -137,50 +175,8 @@ document.addEventListener('DOMContentLoaded',(e) =>
     createBeautifulWord('titleFreedom','Freedom','green','blue','#30360F','red','cyan','#D04861');
 });
 
-if(boxFreedom)
-{
-    boxFreedom.addEventListener('pointermove',(e) =>
-    {
-        if(isMoveElem(absCopyNode))
-        {
-            const rect = boxFreedom.getBoundingClientRect();
 
-            coordinateByDivFreedom[0] = e.clientX - rect.left - coordinateMouseOnImg_X;//(absCopyNode.width / 2); - if center of cursor on mouse
-            coordinateByDivFreedom[1] = e.clientY - rect.top - coordinateMouseOnImg_Y;//(absCopyNode.height / 2 ); - if center of cursor on mouse
-        
-        }
-    });
-}
 
-document.addEventListener('pointerup', (e) =>
-{
-    if(isMoveElem(absCopyNode) === true)
-    {
-
-        if( isCurrentBox(e.target,'box_flex'))
-        {
-            console.log('flex');
-            removeBackgroundToBox(backgroundBoxFlex,'boxFlexChangeBackground');
-            absCopyNode.style = 'position:relative;';
-            boxFlex.appendChild(absCopyNode);
-        }else if(isCurrentBox(e.target,'box_freedom'))
-        {
-            console.log('freedom');
-            removeBackgroundToBox(backgroundBoxFreedom,'boxFreedomChangeBackground');
-            boxFreedom.appendChild(absCopyNode);
-            //absCopyNode.style.imageRendering = 'pixelated';
-            absCopyNode.style.left =  coordinateByDivFreedom[0] + 'px';
-            absCopyNode.style.top  = coordinateByDivFreedom[1] + 'px';
-        }else 
-        {
-            elems.removeChild(absCopyNode); 
-        }
-        document.removeEventListener('pointermove',moveElem,true);
-    }
-    
-    isDown = false;
-    absCopyNode = null;
-},true);
 
 if (document.addEventListener) 
 {
